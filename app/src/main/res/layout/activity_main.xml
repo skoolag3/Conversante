@@ -11,15 +11,17 @@
         android:id="@+id/lstConversantes"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_above="@+id/btnNovo" />
+        android:layout_above="@+id/btnNovo"
+        />
 
     <Button
         android:id="@+id/btnNovo"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_width="300dp"
+        android:layout_height="50dp"
+        android:layout_centerHorizontal="true"
         android:layout_alignParentBottom="true"
         android:text="Novo Conversante"
-        app:strokeColor="#89FB02"
-        app:strokeWidth="@android:dimen/config_motionExpressiveFastEffectDamping" />
+        android:backgroundTint="@color/verdeEscuro"
+        />
 
 </RelativeLayout>
