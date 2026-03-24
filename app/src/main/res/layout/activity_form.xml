@@ -46,6 +46,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="24dp"
         android:text="Pronto"
+        android:onClick="btnProntoClick"
         android:backgroundTint="@color/verdeEscuro" />
 
     <LinearLayout
@@ -60,6 +61,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:text="Limpar"
+            android:onClick="btnLimparClick"
             android:layout_marginEnd="4dp" />
 
         <Button
@@ -68,6 +70,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:text="Excluir"
+            android:onClick="btnExcluirClick"
             android:layout_marginStart="4dp"
             android:backgroundTint="#FF0000" />
 

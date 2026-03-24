@@ -16,7 +16,7 @@ import java.util.List;
 public class FormActivity extends AppCompatActivity {
 
     private EditText edtNome, edtCelular, edtEmail;
-    private Button btnPronto, btnLimpar, btnExcluir;
+    private Button btnExcluir;
     private ConversanteDAO cDAO;
     private int conversanteId = -1;
 
@@ -28,13 +28,10 @@ public class FormActivity extends AppCompatActivity {
         edtNome = findViewById(R.id.edtNome);
         edtCelular = findViewById(R.id.edtCelular);
         edtEmail = findViewById(R.id.edtEmail);
-        btnPronto = findViewById(R.id.btnPronto);
-        btnLimpar = findViewById(R.id.btnLimpar);
         btnExcluir = findViewById(R.id.btnExcluir);
 
         cDAO = new ConversanteDAO(this);
 
-        // Se recebeu ID, é edição/exclusão
         if (getIntent().hasExtra("ID")) {
             conversanteId = getIntent().getIntExtra("ID", -1);
             carregarDados();
@@ -42,27 +39,6 @@ public class FormActivity extends AppCompatActivity {
         } else {
             btnExcluir.setVisibility(View.GONE);
         }
-
-        btnPronto.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                salvar();
-            }
-        });
-
-        btnLimpar.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                limparCampos();
-            }
-        });
-
-        btnExcluir.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                excluir();
-            }
-        });
     }
 
     private void carregarDados() {
@@ -80,16 +56,7 @@ public class FormActivity extends AppCompatActivity {
         }
     }
 
-    private void limparCampos() {
-        edtNome.setText("");
-        edtCelular.setText("");
-        edtEmail.setText("");
-        edtNome.requestFocus();
-        conversanteId = -1;
-        btnExcluir.setVisibility(View.GONE);
-    }
-
-    private void salvar() {
+    public void btnProntoClick(View v) {
         String nome = edtNome.getText().toString();
         String celular = edtCelular.getText().toString();
         String email = edtEmail.getText().toString();
@@ -118,7 +85,16 @@ public class FormActivity extends AppCompatActivity {
         }
     }
 
-    private void excluir() {
+    public void btnLimparClick(View v) {
+        edtNome.setText("");
+        edtCelular.setText("");
+        edtEmail.setText("");
+        edtNome.requestFocus();
+        conversanteId = -1;
+        btnExcluir.setVisibility(View.GONE);
+    }
+
+    public void btnExcluirClick(View v) {
         if (conversanteId != -1) {
             cDAO.abrir();
             long res = cDAO.Excluir(conversanteId);

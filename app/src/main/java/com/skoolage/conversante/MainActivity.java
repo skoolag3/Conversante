@@ -21,7 +21,6 @@ import java.util.List;
 public class MainActivity extends AppCompatActivity {
 
     private ListView lstConversantes;
-    private FloatingActionButton fabNovo;
     private ConversanteDAO cDAO;
     private List<Conversantes> listaConversantes;
 
@@ -31,17 +30,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         lstConversantes = findViewById(R.id.lstConversantes);
-        fabNovo = findViewById(R.id.fabNovo);
-
         cDAO = new ConversanteDAO(this);
-
-        fabNovo.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intent = new Intent(MainActivity.this, FormActivity.class);
-                startActivity(intent);
-            }
-        });
 
         lstConversantes.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -52,6 +41,11 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
+    }
+
+    public void btnNovoClick(View v) {
+        Intent intent = new Intent(MainActivity.this, FormActivity.class);
+        startActivity(intent);
     }
 
     @Override
@@ -65,7 +59,6 @@ public class MainActivity extends AppCompatActivity {
         listaConversantes = cDAO.listarTudo();
         cDAO.fechar();
 
-        // Custom adapter para usar o contato_item.xml
         ArrayAdapter<Conversantes> adapter = new ArrayAdapter<Conversantes>(this, R.layout.contato_item, listaConversantes) {
             @Override
             public View getView(int position, View convertView, ViewGroup parent) {

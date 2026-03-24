@@ -18,9 +18,9 @@
         android:layout_height="wrap_content"
         android:layout_alignParentEnd="true"
         android:layout_alignParentBottom="true"
-        android:onClick="Novo"
         android:layout_margin="16dp"
         android:contentDescription="Novo Conversante"
+        android:onClick="btnNovoClick"
         app:srcCompat="@android:drawable/ic_input_add"
         app:backgroundTint="@color/verdeEscuro"
         app:tint="@color/white" />
