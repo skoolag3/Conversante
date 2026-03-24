@@ -11,13 +11,12 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.skoolage.conversante.dao.ConversanteDAO;
 import com.skoolage.conversante.models.Conversantes;
 
-import java.util.List;
-
 public class FormActivity extends AppCompatActivity {
 
     private EditText edtNome, edtCelular, edtEmail;
-    private Button btnExcluir;
+    private Button btnInserir, btnAtualizar, btnExcluir;
     private ConversanteDAO cDAO;
+    private Conversantes conversante;
     private int conversanteId = -1;
 
     @Override
@@ -28,35 +27,29 @@ public class FormActivity extends AppCompatActivity {
         edtNome = findViewById(R.id.edtNome);
         edtCelular = findViewById(R.id.edtCelular);
         edtEmail = findViewById(R.id.edtEmail);
+        btnInserir = findViewById(R.id.btnInserir);
+        btnAtualizar = findViewById(R.id.btnAtualizar);
         btnExcluir = findViewById(R.id.btnExcluir);
 
         cDAO = new ConversanteDAO(this);
 
-        if (getIntent().hasExtra("ID")) {
-            conversanteId = getIntent().getIntExtra("ID", -1);
-            carregarDados();
-            btnExcluir.setVisibility(View.VISIBLE);
-        } else {
-            btnExcluir.setVisibility(View.GONE);
-        }
-    }
-
-    private void carregarDados() {
-        cDAO.abrir();
-        List<Conversantes> lista = cDAO.listarTudo();
-        cDAO.fechar();
-
-        for (Conversantes c : lista) {
-            if (c.getId() == conversanteId) {
-                edtNome.setText(c.getNome());
-                edtCelular.setText(c.getCelular());
-                edtEmail.setText(c.getEmail());
-                break;
+        if (getIntent().hasExtra("CONVERSANTE")) {
+            conversante = (Conversantes) getIntent().getSerializableExtra("CONVERSANTE");
+            if (conversante != null) {
+                conversanteId = conversante.getId();
+                edtNome.setText(conversante.getNome());
+                edtCelular.setText(conversante.getCelular());
+                edtEmail.setText(conversante.getEmail());
             }
         }
+
+        boolean hasID = conversanteId != -1;
+        btnInserir.setVisibility(hasID ? View.GONE : View.VISIBLE);
+        btnAtualizar.setVisibility(hasID ? View.VISIBLE : View.GONE);
+        btnExcluir.setVisibility(hasID ? View.VISIBLE : View.GONE);
     }
 
-    public void btnProntoClick(View v) {
+    public void btnInserirClick(View v) {
         String nome = edtNome.getText().toString();
         String celular = edtCelular.getText().toString();
         String email = edtEmail.getText().toString();
@@ -68,20 +61,35 @@ public class FormActivity extends AppCompatActivity {
 
         Conversantes c = new Conversantes(nome, celular, email);
         cDAO.abrir();
-        long res;
-        if (conversanteId == -1) {
-            res = cDAO.Inserir(c);
-        } else {
-            c.setId(conversanteId);
-            res = cDAO.Alterar(c);
-        }
+        long res = cDAO.Inserir(c);
         cDAO.fechar();
 
         if (res > 0) {
-            Toast.makeText(this, "Sucesso!", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Inserido com sucesso!", Toast.LENGTH_SHORT).show();
             finish();
-        } else {
-            Toast.makeText(this, "Erro ao processar", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    public void btnAtualizarClick(View v) {
+        String nome = edtNome.getText().toString();
+        String celular = edtCelular.getText().toString();
+        String email = edtEmail.getText().toString();
+
+        if (nome.isEmpty() || celular.isEmpty() || email.isEmpty()) {
+            Toast.makeText(this, "Preencha todos os campos", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        Conversantes c = new Conversantes(nome, celular, email);
+        c.setId(conversanteId);
+
+        cDAO.abrir();
+        long res = cDAO.Alterar(c);
+        cDAO.fechar();
+
+        if (res > 0) {
+            Toast.makeText(this, "Atualizado com sucesso!", Toast.LENGTH_SHORT).show();
+            finish();
         }
     }
 
@@ -90,7 +98,13 @@ public class FormActivity extends AppCompatActivity {
         edtCelular.setText("");
         edtEmail.setText("");
         edtNome.requestFocus();
+
         conversanteId = -1;
+        conversante = null;
+
+        // Atualiza botões manualmente
+        btnInserir.setVisibility(View.VISIBLE);
+        btnAtualizar.setVisibility(View.GONE);
         btnExcluir.setVisibility(View.GONE);
     }
 
@@ -101,10 +115,8 @@ public class FormActivity extends AppCompatActivity {
             cDAO.fechar();
 
             if (res > 0) {
-                Toast.makeText(this, "Excluído!", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "Excluído com sucesso!", Toast.LENGTH_SHORT).show();
                 finish();
-            } else {
-                Toast.makeText(this, "Erro ao excluir", Toast.LENGTH_SHORT).show();
             }
         }
     }

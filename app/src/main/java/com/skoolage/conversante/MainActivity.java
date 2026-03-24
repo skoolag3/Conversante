@@ -11,7 +11,6 @@ import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.skoolage.conversante.dao.ConversanteDAO;
 import com.skoolage.conversante.models.Conversantes;
 
@@ -37,7 +36,7 @@ public class MainActivity extends AppCompatActivity {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Conversantes selecionado = listaConversantes.get(position);
                 Intent intent = new Intent(MainActivity.this, FormActivity.class);
-                intent.putExtra("ID", selecionado.getId());
+                intent.putExtra("CONVERSANTE", selecionado);
                 startActivity(intent);
             }
         });

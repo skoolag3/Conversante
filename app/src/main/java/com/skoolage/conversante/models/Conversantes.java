@@ -1,6 +1,8 @@
 package com.skoolage.conversante.models;
 
-public class Conversantes{
+import java.io.Serializable;
+
+public class Conversantes implements Serializable {
 
     private int Id;
     private String Nome;
@@ -48,7 +50,7 @@ public class Conversantes{
         return Celular;
     }
 
-    public void setCelular(String celular) {
+    public void setCellular(String celular) {
         Celular = celular;
     }
 }

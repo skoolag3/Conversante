@@ -41,13 +41,21 @@
         android:inputType="textEmailAddress" />
 
     <Button
-        android:id="@+id/btnPronto"
+        android:id="@+id/btnInserir"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="24dp"
-        android:text="Pronto"
-        android:onClick="btnProntoClick"
+        android:layout_marginTop="16dp"
+        android:text="Inserir"
+        android:onClick="btnInserirClick"
         android:backgroundTint="@color/verdeEscuro" />
+
+    <Button
+        android:id="@+id/btnAtualizar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Atualizar"
+        android:onClick="btnAtualizarClick"
+        android:backgroundTint="#2196F3" />
 
     <LinearLayout
         android:layout_width="match_parent"
