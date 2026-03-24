@@ -37,6 +37,21 @@ public class ConversanteDAO {
         return db.insert("Conversantes", null, dados);
     }
 
+    public long Alterar(Conversantes c){
+        ContentValues dados = new ContentValues();
+        dados.put("Nome", c.getNome());
+        dados.put("Celular", c.getCelular());
+        dados.put("Email", c.getEmail());
+
+        String[] whereArgs = {String.valueOf(c.getId())};
+        return db.update("Conversantes", dados, "Id = ?", whereArgs);
+    }
+
+    public long Excluir(int id){
+        String[] whereArgs = {String.valueOf(id)};
+        return db.delete("Conversantes", "Id = ?", whereArgs);
+    }
+
     public List<Conversantes> listarTudo(){
         List<Conversantes> lista = new ArrayList<>();
         String[] campos = new String[] {"Id", "Nome", "Celular", "Email"};

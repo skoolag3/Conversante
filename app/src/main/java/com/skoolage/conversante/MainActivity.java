@@ -3,13 +3,15 @@ package com.skoolage.conversante;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.skoolage.conversante.dao.ConversanteDAO;
 import com.skoolage.conversante.models.Conversantes;
 
@@ -19,11 +21,9 @@ import java.util.List;
 public class MainActivity extends AppCompatActivity {
 
     private ListView lstConversantes;
-    private Button btnNovo;
+    private FloatingActionButton fabNovo;
     private ConversanteDAO cDAO;
     private List<Conversantes> listaConversantes;
-    private List<String> nomesConversantes;
-    private ArrayAdapter<String> adapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,12 +31,11 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         lstConversantes = findViewById(R.id.lstConversantes);
-        btnNovo = findViewById(R.id.btnNovo);
+        fabNovo = findViewById(R.id.fabNovo);
 
         cDAO = new ConversanteDAO(this);
-        nomesConversantes = new ArrayList<>();
 
-        btnNovo.setOnClickListener(new View.OnClickListener() {
+        fabNovo.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(MainActivity.this, FormActivity.class);
@@ -66,12 +65,25 @@ public class MainActivity extends AppCompatActivity {
         listaConversantes = cDAO.listarTudo();
         cDAO.fechar();
 
-        nomesConversantes.clear();
-        for (Conversantes c : listaConversantes) {
-            nomesConversantes.add(c.getNome() + " - " + c.getCelular());
-        }
+        // Custom adapter para usar o contato_item.xml
+        ArrayAdapter<Conversantes> adapter = new ArrayAdapter<Conversantes>(this, R.layout.contato_item, listaConversantes) {
+            @Override
+            public View getView(int position, View convertView, ViewGroup parent) {
+                if (convertView == null) {
+                    convertView = getLayoutInflater().inflate(R.layout.contato_item, parent, false);
+                }
 
-        adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, nomesConversantes);
+                Conversantes c = getItem(position);
+                TextView txtNome = convertView.findViewById(R.id.txtNomeItem);
+                TextView txtCelular = convertView.findViewById(R.id.txtCelularItem);
+
+                txtNome.setText(c.getNome());
+                txtCelular.setText(c.getCelular());
+
+                return convertView;
+            }
+        };
+
         lstConversantes.setAdapter(adapter);
     }
 }
