@@ -2,6 +2,7 @@ package com.skoolage.conversante;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -61,15 +62,21 @@ public class MainActivity extends AppCompatActivity {
         lstConversantes.setOnItemClickListener((parent, view, position, id) -> {
             Conversantes selecionado = listaConversantes.get(position);
             Intent intent = new Intent(MainActivity.this, FormActivity.class);
-            intent.putExtra("CONVERSANTE", selecionado);
+            intent.putExtra("CONVERSANTE", (Parcelable) selecionado);
             formLauncher.launch(intent);
         });
     }
 
     public void btnNovoClick(View v) {
         Intent intent = new Intent(MainActivity.this, FormActivity.class);
+
+        Conversantes novo = new Conversantes(); // objeto vazio
+        intent.putExtra("CONVERSANTE", (Parcelable) novo);
+
         formLauncher.launch(intent);
     }
+
+
 
     private void listar(ConversanteDAO cDAO) {
         listaConversantes = cDAO.listarTudo();

@@ -36,9 +36,9 @@ public class FormActivity extends AppCompatActivity {
         cDAO = new ConversanteDAO(this);
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            conversante = getIntent().getSerializableExtra("CONVERSANTE", Conversantes.class);
+            conversante = getIntent().getParcelableExtra("CONVERSANTE", Conversantes.class);
         } else {
-            conversante = (Conversantes) getIntent().getSerializableExtra("CONVERSANTE");
+            conversante = getIntent().getParcelableExtra("CONVERSANTE");
         }
 
         if (conversante != null) {

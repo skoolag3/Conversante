@@ -28,6 +28,7 @@ public class ConversanteDAO {
         helper.close();
     }
 
+
     public Long Inserir(Conversantes c){
         ContentValues dados = new ContentValues();
         dados.put("Nome", c.getNome());
