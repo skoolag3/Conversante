@@ -1,5 +1,7 @@
 package com.skoolage.conversante;
 
+import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -33,14 +35,17 @@ public class FormActivity extends AppCompatActivity {
 
         cDAO = new ConversanteDAO(this);
 
-        if (getIntent().hasExtra("CONVERSANTE")) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            conversante = getIntent().getSerializableExtra("CONVERSANTE", Conversantes.class);
+        } else {
             conversante = (Conversantes) getIntent().getSerializableExtra("CONVERSANTE");
-            if (conversante != null) {
-                conversanteId = conversante.getId();
-                edtNome.setText(conversante.getNome());
-                edtCelular.setText(conversante.getCelular());
-                edtEmail.setText(conversante.getEmail());
-            }
+        }
+
+        if (conversante != null) {
+            conversanteId = conversante.getId();
+            edtNome.setText(conversante.getNome());
+            edtCelular.setText(conversante.getCelular());
+            edtEmail.setText(conversante.getEmail());
         }
 
         boolean hasID = conversanteId != -1;
@@ -50,47 +55,48 @@ public class FormActivity extends AppCompatActivity {
     }
 
     public void btnInserirClick(View v) {
-        String nome = edtNome.getText().toString();
-        String celular = edtCelular.getText().toString();
-        String email = edtEmail.getText().toString();
 
-        if (nome.isEmpty() || celular.isEmpty() || email.isEmpty()) {
-            Toast.makeText(this, "Preencha todos os campos", Toast.LENGTH_SHORT).show();
-            return;
-        }
-
-        Conversantes c = new Conversantes(nome, celular, email);
+        Conversantes c = new Conversantes(
+                edtNome.getText().toString(),
+                edtCelular.getText().toString(),
+                edtEmail.getText().toString()
+        );
         cDAO.abrir();
         long res = cDAO.Inserir(c);
         cDAO.fechar();
 
-        if (res > 0) {
-            Toast.makeText(this, "Inserido com sucesso!", Toast.LENGTH_SHORT).show();
-            finish();
+        if (res == 0) {
+            Toast.makeText(this, "Erro ao inserir", Toast.LENGTH_SHORT).show();
+            return;
         }
+        Intent intent = new Intent();
+        intent.putExtra("RESULT", "INSERIU"); // ou ATUALIZOU / EXCLUIU
+        setResult(RESULT_OK, intent);
+        finish();
     }
 
     public void btnAtualizarClick(View v) {
-        String nome = edtNome.getText().toString();
-        String celular = edtCelular.getText().toString();
-        String email = edtEmail.getText().toString();
 
-        if (nome.isEmpty() || celular.isEmpty() || email.isEmpty()) {
-            Toast.makeText(this, "Preencha todos os campos", Toast.LENGTH_SHORT).show();
-            return;
-        }
-
-        Conversantes c = new Conversantes(nome, celular, email);
+        Conversantes c = new Conversantes(
+                edtNome.getText().toString(),
+                edtCelular.getText().toString(),
+                edtEmail.getText().toString()
+        );
         c.setId(conversanteId);
 
         cDAO.abrir();
         long res = cDAO.Alterar(c);
         cDAO.fechar();
 
-        if (res > 0) {
-            Toast.makeText(this, "Atualizado com sucesso!", Toast.LENGTH_SHORT).show();
-            finish();
+        if (res == 0) {
+            Toast.makeText(this, "Erro ao atualizar", Toast.LENGTH_SHORT).show();
+            return;
         }
+
+        Intent intent = new Intent();
+        intent.putExtra("RESULT", "INSERIU"); // ou ATUALIZOU / EXCLUIU
+        setResult(RESULT_OK, intent);
+        finish();
     }
 
     public void btnLimparClick(View v) {
@@ -109,15 +115,19 @@ public class FormActivity extends AppCompatActivity {
     }
 
     public void btnExcluirClick(View v) {
-        if (conversanteId != -1) {
-            cDAO.abrir();
-            long res = cDAO.Excluir(conversanteId);
-            cDAO.fechar();
 
-            if (res > 0) {
-                Toast.makeText(this, "Excluído com sucesso!", Toast.LENGTH_SHORT).show();
-                finish();
-            }
+        cDAO.abrir();
+        long res = cDAO.Excluir(conversanteId);
+        cDAO.fechar();
+
+        if (res == 0) {
+            Toast.makeText(this, "Erro ao excluir", Toast.LENGTH_SHORT).show();
+            return;
         }
+
+        Intent intent = new Intent();
+        intent.putExtra("RESULT", "INSERIU"); // ou ATUALIZOU / EXCLUIU
+        setResult(RESULT_OK, intent);
+        finish();
     }
 }

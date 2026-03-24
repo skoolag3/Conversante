@@ -9,12 +9,13 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.skoolage.conversante.dao.ConversanteDAO;
 import com.skoolage.conversante.models.Conversantes;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
@@ -22,6 +23,8 @@ public class MainActivity extends AppCompatActivity {
     private ListView lstConversantes;
     private ConversanteDAO cDAO;
     private List<Conversantes> listaConversantes;
+
+    ActivityResultLauncher<Intent> formLauncher;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,34 +34,49 @@ public class MainActivity extends AppCompatActivity {
         lstConversantes = findViewById(R.id.lstConversantes);
         cDAO = new ConversanteDAO(this);
 
-        lstConversantes.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Conversantes selecionado = listaConversantes.get(position);
-                Intent intent = new Intent(MainActivity.this, FormActivity.class);
-                intent.putExtra("CONVERSANTE", selecionado);
-                startActivity(intent);
-            }
+        formLauncher = registerForActivityResult(
+                new ActivityResultContracts.StartActivityForResult(),
+                result -> {
+                    if (result.getResultCode() == RESULT_OK) {
+
+                        // pegando retorno do FormActivity (se quiser usar depois)
+                        Intent data = result.getData();
+                        if (data != null && data.hasExtra("RESULT")) {
+                            String acao = data.getStringExtra("RESULT");
+                        }
+
+                        // abre, lista e fecha
+                        cDAO.abrir();
+                        listar(cDAO);
+                        cDAO.fechar();
+                    }
+                }
+        );
+
+        // inicial
+        cDAO.abrir();
+        listar(cDAO);
+        cDAO.fechar();
+
+        lstConversantes.setOnItemClickListener((parent, view, position, id) -> {
+            Conversantes selecionado = listaConversantes.get(position);
+            Intent intent = new Intent(MainActivity.this, FormActivity.class);
+            intent.putExtra("CONVERSANTE", selecionado);
+            formLauncher.launch(intent);
         });
     }
 
     public void btnNovoClick(View v) {
         Intent intent = new Intent(MainActivity.this, FormActivity.class);
-        startActivity(intent);
+        formLauncher.launch(intent);
     }
 
-    @Override
-    protected void onResume() {
-        super.onResume();
-        listar();
-    }
-
-    private void listar() {
-        cDAO.abrir();
+    private void listar(ConversanteDAO cDAO) {
         listaConversantes = cDAO.listarTudo();
-        cDAO.fechar();
 
-        ArrayAdapter<Conversantes> adapter = new ArrayAdapter<Conversantes>(this, R.layout.contato_item, listaConversantes) {
+        ArrayAdapter<Conversantes> adapter = new ArrayAdapter<Conversantes>(
+                this, R.layout.contato_item, listaConversantes) {
+
             @Override
             public View getView(int position, View convertView, ViewGroup parent) {
                 if (convertView == null) {
@@ -66,6 +84,7 @@ public class MainActivity extends AppCompatActivity {
                 }
 
                 Conversantes c = getItem(position);
+
                 TextView txtNome = convertView.findViewById(R.id.txtNomeItem);
                 TextView txtCelular = convertView.findViewById(R.id.txtCelularItem);
 
