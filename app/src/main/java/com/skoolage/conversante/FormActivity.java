@@ -41,11 +41,13 @@ public class FormActivity extends AppCompatActivity {
             conversante = getIntent().getParcelableExtra("CONVERSANTE");
         }
 
-        if (conversante != null) {
+        if (conversante != null && conversante.getId() > 0) {
             conversanteId = conversante.getId();
             edtNome.setText(conversante.getNome());
             edtCelular.setText(conversante.getCelular());
             edtEmail.setText(conversante.getEmail());
+        } else {
+            conversante = null;
         }
 
         boolean hasID = conversanteId != -1;
@@ -61,40 +63,41 @@ public class FormActivity extends AppCompatActivity {
                 edtCelular.getText().toString(),
                 edtEmail.getText().toString()
         );
-        cDAO.abrir();
-        long res = cDAO.Inserir(c);
-        cDAO.fechar();
 
-        if (res == 0) {
+        long id = cDAO.inserir(c);
+
+        if (id <= 0) {
             Toast.makeText(this, "Erro ao inserir", Toast.LENGTH_SHORT).show();
             return;
         }
+
         Intent intent = new Intent();
-        intent.putExtra("RESULT", "INSERIU"); // ou ATUALIZOU / EXCLUIU
+        intent.putExtra("RESULT", "INSERIU");
         setResult(RESULT_OK, intent);
         finish();
     }
 
     public void btnAtualizarClick(View v) {
 
-        Conversantes c = new Conversantes(
-                edtNome.getText().toString(),
-                edtCelular.getText().toString(),
-                edtEmail.getText().toString()
-        );
-        c.setId(conversanteId);
+        conversante.setNome(edtNome.getText().toString());
+        conversante.setCelular(edtCelular.getText().toString());
+        conversante.setEmail(edtEmail.getText().toString());
 
-        cDAO.abrir();
-        long res = cDAO.Alterar(c);
-        cDAO.fechar();
+        cDAO.alterar(conversante);
 
-        if (res == 0) {
-            Toast.makeText(this, "Erro ao atualizar", Toast.LENGTH_SHORT).show();
-            return;
-        }
+        Toast.makeText(this, "Atualizado com sucesso!", Toast.LENGTH_SHORT).show();
+        setResult(RESULT_OK);
+        finish();
+    }
+
+    public void btnExcluirClick(View v) {
+
+        if (conversante == null) return;
+
+        cDAO.excluir(conversante);
 
         Intent intent = new Intent();
-        intent.putExtra("RESULT", "INSERIU"); // ou ATUALIZOU / EXCLUIU
+        intent.putExtra("RESULT", "EXCLUIU");
         setResult(RESULT_OK, intent);
         finish();
     }
@@ -108,26 +111,8 @@ public class FormActivity extends AppCompatActivity {
         conversanteId = -1;
         conversante = null;
 
-        // Atualiza botões manualmente
         btnInserir.setVisibility(View.VISIBLE);
         btnAtualizar.setVisibility(View.GONE);
         btnExcluir.setVisibility(View.GONE);
-    }
-
-    public void btnExcluirClick(View v) {
-
-        cDAO.abrir();
-        long res = cDAO.Excluir(conversanteId);
-        cDAO.fechar();
-
-        if (res == 0) {
-            Toast.makeText(this, "Erro ao excluir", Toast.LENGTH_SHORT).show();
-            return;
-        }
-
-        Intent intent = new Intent();
-        intent.putExtra("RESULT", "INSERIU"); // ou ATUALIZOU / EXCLUIU
-        setResult(RESULT_OK, intent);
-        finish();
     }
 }

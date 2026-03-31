@@ -89,7 +89,7 @@ public class Conversantes implements Serializable, Parcelable {
         return Celular;
     }
 
-    public void setCellular(String celular) {
+    public void setCelular(String celular) {
         Celular = celular;
     }
 }
