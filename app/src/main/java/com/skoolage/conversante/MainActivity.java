@@ -5,7 +5,7 @@ import android.os.Bundle;
 import android.os.Parcelable;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
+import android.view.LayoutInflater;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -39,14 +39,6 @@ public class MainActivity extends AppCompatActivity {
                 new ActivityResultContracts.StartActivityForResult(),
                 result -> {
                     if (result.getResultCode() == RESULT_OK) {
-
-                        // pegando retorno do FormActivity (se quiser usar depois)
-                        Intent data = result.getData();
-                        if (data != null && data.hasExtra("RESULT")) {
-                            String acao = data.getStringExtra("RESULT");
-                        }
-
-                        // abre, lista e fecha
                         cDAO.abrir();
                         listar(cDAO);
                         cDAO.fechar();
@@ -70,13 +62,11 @@ public class MainActivity extends AppCompatActivity {
     public void btnNovoClick(View v) {
         Intent intent = new Intent(MainActivity.this, FormActivity.class);
 
-        Conversantes novo = new Conversantes(); // objeto vazio
+        Conversantes novo = new Conversantes();
         intent.putExtra("CONVERSANTE", (Parcelable) novo);
 
         formLauncher.launch(intent);
     }
-
-
 
     private void listar(ConversanteDAO cDAO) {
         listaConversantes = cDAO.listarTudo();
@@ -86,8 +76,10 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public View getView(int position, View convertView, ViewGroup parent) {
+
                 if (convertView == null) {
-                    convertView = getLayoutInflater().inflate(R.layout.contato_item, parent, false);
+                    convertView = LayoutInflater.from(getContext())
+                            .inflate(R.layout.contato_item, parent, false);
                 }
 
                 Conversantes c = getItem(position);
@@ -103,5 +95,11 @@ public class MainActivity extends AppCompatActivity {
         };
 
         lstConversantes.setAdapter(adapter);
+
+        lstConversantes.setOnItemClickListener((parent, view, position, id) -> {
+            Intent detalheDados = new Intent(MainActivity.this, FormActivity.class);
+            detalheDados.putExtra("CONVERSANTE", (Parcelable) listaConversantes.get(position));
+            formLauncher.launch(detalheDados);
+        });
     }
 }

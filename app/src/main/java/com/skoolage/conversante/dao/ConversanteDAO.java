@@ -20,45 +20,80 @@ public class ConversanteDAO {
         helper = new DBHelper(context);
     }
 
-    public void abrir(){
+    public void abrir() {
         db = helper.getWritableDatabase();
     }
 
-    public void fechar(){
-        helper.close();
+    public void fechar() {
+        if (db != null && db.isOpen()) {
+            db.close();
+        }
     }
 
+    // INSERT
+    public long inserir(Conversantes c) {
+        abrir();
 
-    public Long Inserir(Conversantes c){
         ContentValues dados = new ContentValues();
         dados.put("Nome", c.getNome());
         dados.put("Celular", c.getCelular());
         dados.put("Email", c.getEmail());
 
-        return db.insert("Conversantes", null, dados);
+        long id = db.insert("Conversantes", null, dados);
+
+        fechar();
+        return id;
     }
 
-    public long Alterar(Conversantes c){
+    // UPDATE
+    public void alterar(Conversantes c) {
+        if (c.getId() <= 0) return;
+
+        abrir();
+
         ContentValues dados = new ContentValues();
         dados.put("Nome", c.getNome());
         dados.put("Celular", c.getCelular());
         dados.put("Email", c.getEmail());
 
-        String[] whereArgs = {String.valueOf(c.getId())};
-        return db.update("Conversantes", dados, "Id = ?", whereArgs);
+
+        db.update("Conversantes", dados,
+                "Id = ?", new String[]{String.valueOf(c.getId())});
+
+        fechar();
     }
 
-    public long Excluir(int id){
-        String[] whereArgs = {String.valueOf(id)};
-        return db.delete("Conversantes", "Id = ?", whereArgs);
+    // DELETE
+    public void excluir(Conversantes c) {
+        if (c.getId() <= 0) return;
+
+        abrir();
+
+        db.delete(
+                "Conversantes",
+                "Id = ?",
+                new String[]{String.valueOf(c.getId())}
+        );
+
+        fechar();
     }
 
-    public List<Conversantes> listarTudo(){
+    // SELECT ALL
+    public List<Conversantes> listarTudo() {
+        abrir();
+
         List<Conversantes> lista = new ArrayList<>();
-        String[] campos = new String[] {"Id", "Nome", "Celular", "Email"};
+        String[] campos = {"Id", "Nome", "Celular", "Email"};
 
-        Cursor dados = db.query("Conversantes", campos, null,
-                null,null, null, "Nome");
+        Cursor dados = db.query(
+                "Conversantes",
+                campos,
+                null,
+                null,
+                null,
+                null,
+                "Nome"
+        );
 
         if (dados.moveToFirst()) {
             do {
@@ -71,7 +106,42 @@ public class ConversanteDAO {
                 lista.add(c);
             } while (dados.moveToNext());
         }
+
         dados.close();
+        fechar();
         return lista;
+    }
+
+    // SELECT POR ID (abrir registro específico)
+    public Conversantes buscarPorId(int id) {
+        abrir();
+
+        String[] campos = {"Id", "Nome", "Celular", "Email"};
+        String[] whereArgs = {String.valueOf(id)};
+
+        Cursor dados = db.query(
+                "Conversantes",
+                campos,
+                "Id = ?",
+                whereArgs,
+                null,
+                null,
+                null
+        );
+
+        Conversantes c = null;
+
+        if (dados.moveToFirst()) {
+            c = new Conversantes(
+                    dados.getInt(0),
+                    dados.getString(1),
+                    dados.getString(2),
+                    dados.getString(3)
+            );
+        }
+
+        dados.close();
+        fechar();
+        return c;
     }
 }
